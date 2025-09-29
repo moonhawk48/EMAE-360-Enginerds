@@ -1,4 +1,4 @@
-function [OttoCycleData] = Otto_V1_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, cr, Cp, Cv, eta, Q, OF, D, N, m_air)
+function [OttoCycleData] = Otto_V2_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, cr, Cp, Cv, eta, Q, OF, D, N, m_air)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -26,7 +26,7 @@ function [OttoCycleData] = Otto_V1_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, c
     % Stage 2: Compression
     p2 = p1*cr;
     P2 = P1*(p2/p1)^g;
-    T2 = P2/(p2*R);
+    T2 = T1*(P2/P1)^((g-1)/g);
 
     % Stage 3: Combustion
     T3 = T2 + eta*(Q/(Cp*OF));
