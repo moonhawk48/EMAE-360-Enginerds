@@ -1,4 +1,4 @@
-function [OttoCycleData] = Otto_V2_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, cr, Cp, Cv, eta, Q, OF, D, N, m_air)
+function [OttoCycleData] = Otto_V4_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, cr, Cp, Cv, eta, Q, OF, D, N)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -12,7 +12,6 @@ function [OttoCycleData] = Otto_V2_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, c
     % OF--------Air to Fuel Ratio
     % D---------Displacement (m^3)
     % N---------Engine Speed (rev/min)
-    % m_air-----Mass of air
     
     T1 = Tin;
     P1 = Pin;
@@ -46,7 +45,7 @@ function [OttoCycleData] = Otto_V2_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, c
     P = 0.00134102*N*W/120;
 
     % Specific Fuel Consumption
-    SFC = (C/W)*(m_air/OF)*3.6*10^9; % In kg/J. If you want to convert to g/kW*Hr, multiply by 3600000000
+    SFC = (3.6*10^9)/(OF*(Cv*(T3-T2) - Cv*(T4-T1))); % In kg/J. If you want to convert to g/kW*Hr, multiply by 3600000000
 
     %{
     DataTable = [   "Stage 1, Intake: "         P1 T1   p1
