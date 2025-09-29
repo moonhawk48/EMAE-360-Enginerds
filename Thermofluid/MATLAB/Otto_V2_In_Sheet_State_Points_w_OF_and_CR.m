@@ -43,10 +43,10 @@ function [OttoCycleData] = Otto_V1_In_Sheet_State_Points_w_OF_and_CR(Tin, Pin, c
     %Wcyl = W/C;
 
     % Power
-    P = N*W/120;
+    P = 0.00134102*N*W/120;
 
     % Specific Fuel Consumption
-    SFC = (C/W)*(m_air/OF); % In kg/J. If you want to convert to g/kW*Hr, multiply by 3600000000
+    SFC = (C/W)*(m_air/OF)*3.6*10^9; % In kg/J. If you want to convert to g/kW*Hr, multiply by 3600000000
 
     %{
     DataTable = [   "Stage 1, Intake: "         P1 T1   p1
