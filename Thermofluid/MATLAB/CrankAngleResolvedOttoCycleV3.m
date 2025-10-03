@@ -5,10 +5,10 @@ libLoc = "C:\Users\Lucian\AppData\Roaming\CoolProp";
 % Ambient + fluid composition
 T_inf = 300;        % K
 P_inf = 101300;     % Pa
-AFR = 14.7;
+% AFR = 14.7;
 Cp_ref = getFluidProperty(libLoc,'CPMASS','T',T_inf,'P',P_inf,'Air');
 Cv_ref = getFluidProperty(libLoc,'CVMASS','T',T_inf,'P',P_inf,'Air');
-% fuel / air composition (as you provided)
+% fuel / air composition 
 x_oct = 0.76; x_hept = 0.14; x_eth = 0.10;
 x_N2 = 0.78; x_O2 = 0.21; x_Ar = 0.0093;
 
