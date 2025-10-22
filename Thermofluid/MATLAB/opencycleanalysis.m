@@ -80,45 +80,64 @@ alpha_exhaust_closed_mostly = 715;
 
 for alpha = 1:720
     if alpha < alpha_open_partial
+        % small intake valve opening at start of intake stroke
+        %getting air props
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
+        % setting valve open state
         open = 1;
+        % getting the mdot for that alpha value
         mdot = valve(open,B,dim,T_intake,P_intake,P_exhaust,fluid,lib);
         mdotalpha(alpha) = mdot;
+        % getting the fuel props
         [ierr, Y, h, u, s, v, R, Cp, MW, dvdT, dvdP] = ecp( T_intake, P_intake, phi, ifuel );
         cp_fuel(alpha) = Cp;
         cv_fuel(alpha) = v;
         % piston height based on the stroke minus the sin of 1/2 of the
         % crank angle multiplied by the stroke
         piston_height(alpha) = stroke - stroke*sind(alpha/2);
+        % calculating the piston velocity
         deltay = piston_height(1);
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_open_partial & alpha < alpha_open
+        % medium intake valve opening at start of intake stroke
+        % getting air props
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
+        % setting the valve open state
         open = 2;
+        % getting the mdot for that alpha value
         mdot = valve(open,B,dim,T_intake,P_intake,P_exhaust,fluid,lib);
         mdotalpha(alpha) = mdot;
+        % getting the fuel props
         [ierr, Y, h, u, s, v, R, Cp, MW, dvdT, dvdP] = ecp( T_intake, P_intake, phi, ifuel );
         cp_fuel(alpha) = Cp;
         cv_fuel(alpha) = v;
+        % finding the piston height and velocity
         piston_height(alpha) = stroke - stroke*sind(alpha/2);
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_open & alpha < alpha_intake_closed_partial
+        % fully open intake valve for most of intake stroke
+        % getting the air props
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
+        % setting the valve open state
         open = 3;
+        % getting the mdot
         mdot = valve(open,B,dim,T_intake,P_intake,P_exhaust,fluid,lib);
         mdotalpha(alpha) = mdot;
+        % getting the fuel props
         [ierr, Y, h, u, s, v, R, Cp, MW, dvdT, dvdP] = ecp( T_intake, P_intake, phi, ifuel );
         cp_fuel(alpha) = Cp;
         cv_fuel(alpha) = v;
+        % finding the piston height and velocity
         piston_height(alpha) = stroke - stroke*sind(alpha/2);
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_intake_closed_partial & alpha < alpha_intake_closed_mostly
+        % slightly closed intake valve at the end of the intake stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
@@ -131,6 +150,7 @@ for alpha = 1:720
         piston_height(alpha) = stroke - stroke*sind(alpha/2);
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_intake_closed_mostly & alpha < alpha_intake_closed
+        % mostly closed intake valve at the end of the intake stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
@@ -143,8 +163,10 @@ for alpha = 1:720
         piston_height(alpha) = stroke - stroke*sind(alpha/2);
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_intake_closed & alpha < alpha_exhaust_open_small
+        % both valves closed
         % homogeneous goes here
     elseif alpha >= alpha_exhaust_open_small & alpha < alpha_exhaust_open_partial
+        % slightly open exhaust valve at the start of the exhaust stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
@@ -155,8 +177,10 @@ for alpha = 1:720
         cp_fuel(alpha) = Cp;
         cv_fuel(alpha) = v;
         piston_height(alpha) = stroke - stroke*abs(sind(alpha/2));
+        deltay = piston_height(alpha_exhaust_open_small)
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_exhaust_open_partial & alpha < alpha_exhaust_open
+        % mostly open exhaust valve at the start of the exhaust stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
@@ -169,6 +193,7 @@ for alpha = 1:720
         piston_height(alpha) = stroke - stroke*abs(sind(alpha/2));
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_exhaust_open & alpha < alpha_exhaust_closed_partial
+        % fully open exhaust valve for most of the exhaust stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
@@ -181,6 +206,7 @@ for alpha = 1:720
         piston_height(alpha) = stroke - stroke*abs(sind(alpha/2));
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_exhaust_closed_partial & alpha < alpha_exhaust_closed_mostly
+        % slightly closed exhaust valve for the end of the exhaust stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
@@ -193,6 +219,7 @@ for alpha = 1:720
         piston_height(alpha) = stroke - stroke*abs(sind(alpha/2));
         pistonvel(alpha) = deltay*alpha_per_second;
     elseif alpha >= alpha_exhaust_closed_mostly
+        % mostly closed exhaust valve for the end of the exhaust stroke
         rho_inf(alpha) = getFluidProperty(libLoc,'D','T',T_intake,'P',P_intake,fluid);
         cp_air(alpha) = getFluidProperty(libLoc,'CPMASS','T',T_intake,'P',P_intake,fluid);
         cv_air(alpha) = getFluidProperty(libLoc,'CVMASS','T',T_intake,'P',P_intake,fluid);
