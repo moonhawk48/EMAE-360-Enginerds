@@ -8,7 +8,7 @@ B = .1; % Bore - B (m)
 S = .1143; % Stroke - S (m)
 EPS = 0.25; % Half stroke to rod ratio - EPS
 RPM = 5000; % Engine speed - RPM
-BLOWBY = 0.8; % Blowby coefficient
+BLOWBY = 0.8; % Blowby coefficient - Dependent on piston ring setup
 HEAT = 200; %Initial ht coefficient
 PHI = 1; % Equivalence ratio - PHI
 F = 0.05; % Residual fraction - F
@@ -19,13 +19,6 @@ A0 = 47870; %
 
 T1 = 360;
 P1 = 100; % kPa
-
-if ( nargin == 4 )
-    T1 = varargin{1};
-    P1 = varargin{2};
-    RPM = varargin{3};
-    TW = varargin{4};
-end
 
 OMEGA = RPM*pi/30;
 
@@ -50,9 +43,16 @@ Y(2) = nan;
 Y(3) = T1;
 
 [~, ~, ~, ~, vU, ~, ~, ~, ~, ~] = farg( Y(3), Y(1), PHI, F, fuel_type );
-
 MNOT = VOL/vU;
 M = EM*MNOT;
+
+if ( nargin == 5 )
+    T1 = varargin{1};
+    P1 = varargin{2};
+    RPM = varargin{3};
+    TW = varargin{4};
+    MNOT = varargin{5};
+end
 
 NN = 36*10;
 SAVE.THETA = zeros( NN, 1 );
