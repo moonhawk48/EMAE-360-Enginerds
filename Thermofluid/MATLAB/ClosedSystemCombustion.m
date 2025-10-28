@@ -27,8 +27,25 @@ MW_NO = 30;  % molecular weight of NO, g/mol
 
 THETAS = -25; % Start of heat release (deg ATDC)
 THETAB = 30; % Burn angle (deg)
-THETA = -180; %IVC
-THETA_END = 180; % EVO
+IVC = -180;
+EVO = 180;
+
+
+
+
+
+if ( nargin == 5 )
+    T1 = varargin{1};
+    P1 = varargin{2};
+    RPM = varargin{3};
+    TW = varargin{4};
+    MNOT = varargin{5};
+    IVC = varargin{6}-360;
+    EVO = varargin{7}-360;
+end
+
+THETA = IVC; %IVC
+THETA_END = EVO; % EVO
 DTHETA = 1;
 THETAE = THETA+DTHETA;
 finalStep = floor((THETA_END+abs(THETA))/10);
@@ -45,14 +62,6 @@ Y(3) = T1;
 [~, ~, ~, ~, vU, ~, ~, ~, ~, ~] = farg( Y(3), Y(1), PHI, F, fuel_type );
 MNOT = VOL/vU;
 M = EM*MNOT;
-
-if ( nargin == 5 )
-    T1 = varargin{1};
-    P1 = varargin{2};
-    RPM = varargin{3};
-    TW = varargin{4};
-    MNOT = varargin{5};
-end
 
 NN = 36*10;
 SAVE.THETA = zeros( NN, 1 );
@@ -124,8 +133,8 @@ end
 ETA = Y(4)/MNOT*(1+PHI*FS*(1-F))/PHI/FS/(1-F)/A0;
 IMEP = Y(4)/(pi/4*B^2*S);
 fprintf('ETA = %1.4f  IMEP = %7.3f kPa  NOx = %6.1f ppm\n', ETA, IMEP, NOX_ppm );
-T_out = Y(2);
-P_out = Y(1);
+T_out = [SAVE.TU,SAVE.TB];
+P_out = SAVE.P;
 W_total = Y(4);
 Q_total = Y(5);
 if ( nargin == 0 )
