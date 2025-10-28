@@ -6,7 +6,7 @@
 %inputs: open stage, bore size, valve geomewtry array, inlet temp, inlet
 %pressure, outlet pressure, fluid type, Coolprop Library location
 
-function [mdot,choke] = Valve(open,B,T_0,P_0,P_t,fluid,lib)
+function [mdot,choke] = Valve(open,B,T_0,P_0,P_t)
 %Using Heywood terminology: P_0 = inlet pressure, P_t = outlet pressure
 
     %valve geometry variables
@@ -24,8 +24,6 @@ function [mdot,choke] = Valve(open,B,T_0,P_0,P_t,fluid,lib)
     end
 
     Ac = pi*Dv*Lv;
-
-    libLoc = lib;
 
     % cp = getFluidProperty(libLoc,'CPMASS','T',T_0,'P',P_0,fluid);
     % cv = getFluidProperty(libLoc,'CVMASS','T',T_0,'P',P_0,fluid);
