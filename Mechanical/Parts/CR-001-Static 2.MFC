@@ -1,0 +1,16 @@
+[StartTime]
+CR-001-Static 2.MFC=8s
+[SolverState]
+CR-001-Static 2.MFC=2
+[MainFrame]
+CR-001-Static 2.MFC=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPMBCAAAAAAEBAAAAAEIDAAAAADBCAAAAA
+[ShowMin]
+CR-001-Static 2.MFC=No
+[SolverType]
+CR-001-Static 2.MFC=Linear Analysis
+[StudyType]
+CR-001-Static 2.MFC=0
+[StudyName]
+CR-001-Static 2.MFC=Static 2
+[Solver]
+CR-001-Static 2.MFC=Iterative

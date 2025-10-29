@@ -19,11 +19,11 @@ function [R_min, K_max] = Crankshaft()
                 for o_i = o
                     [R_cw,Kf,Km] = Counterweights(r,rcw,mrot,rho,Ycw,a,R_i,h_i,t_i,o_i);
                     if(R_cw < minR && max(Kf,Km)<=100 && min(Kf,Km) >= 90) %smallest outer radius at least 90% balanced
-                        R_min = [R_cw,0,Kf,0,Km ; R_i,h_i,t_i,o_i];
+                        R_min = [R_cw,Kf,Km,0 ; R_i,h_i,t_i,o_i];
                         minR = R_cw;
                     end
                     if(min(Kf,Km) > maxK && max(Kf,Km) <= 100) %highest balance but don't overbalance
-                        K_max = [R_cw,0,Kf,0,Km ; R_i,h_i,t_i,o_i];
+                        K_max = [R_cw,Kf,Km,0 ; R_i,h_i,t_i,o_i];
                         maxK = min(Kf,Km);
                     end
                 end
