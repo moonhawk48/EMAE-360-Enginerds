@@ -1,0 +1,3 @@
+"Crank Radius" = 5.33333mm
+"Journal Radius" = 31.75mm
+"Counterweight Thickness" = 10mm
