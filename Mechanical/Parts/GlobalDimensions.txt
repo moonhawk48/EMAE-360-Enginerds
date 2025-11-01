@@ -1,5 +1,5 @@
 "Crank Radius" = 5.33mm
 "Journal Radius" = 31.75mm
 "Counterweight Thickness" = 10mm
-"Bore" = 96mm
-"Stroke" = 106.67mm
+"Bore" = 108mm
+"Stroke" = 86.4mm

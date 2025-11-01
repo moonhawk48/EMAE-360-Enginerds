@@ -1,0 +1,16 @@
+[StartTime]
+PS-001-Static 2.MFC=3s
+[SolverState]
+PS-001-Static 2.MFC=2
+[MainFrame]
+PS-001-Static 2.MFC=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPMECAAAAAHEBAAAAAELDAAAAAKBCAAAAA
+[ShowMin]
+PS-001-Static 2.MFC=No
+[SolverType]
+PS-001-Static 2.MFC=Linear Analysis
+[StudyType]
+PS-001-Static 2.MFC=0
+[StudyName]
+PS-001-Static 2.MFC=Static 2
+[Solver]
+PS-001-Static 2.MFC=Iterative
