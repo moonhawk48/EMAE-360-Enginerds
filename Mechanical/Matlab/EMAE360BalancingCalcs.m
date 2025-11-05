@@ -15,11 +15,11 @@ clear; clc;
 
 % Inputs
 
-r     = 0.05;            % [m] crank radius (5 cm)
+r     = 0.0432;            % [m] crank radius (4.32 cm)
 l     = 0.1524;          % [m] conrod length (15.24 cm)
 m_rec = 2.016141732;     % [kg] reciprocating mass per cylinder
 rpm   = 7031;            % [rev/min] evaluation speed
-B     = 0.20;            % [m] spacing between cylinder centerlines (measure in CAD)
+B     = 0.05;            % [m] spacing between cylinder centerlines (measure in CAD)
 
 
 % Derived and angle grid
