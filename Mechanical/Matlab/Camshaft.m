@@ -85,8 +85,8 @@ theta_rad = deg2rad(theta_total);
 dS_dtheta = [diff(S)./diff(theta_rad), 0];  % mm/rad
 
 % Flat-faced follower contact coordinates
-x = (R_b + S) .* sin(theta_rad) + dS_dtheta .* cos(theta_rad);
-y = (R_b + S) .* cos(theta_rad) - dS_dtheta .* sin(theta_rad);
+x = (R_b + S) .* cos(theta_rad) - dS_dtheta .* sin(theta_rad);
+y = (R_b + S) .* sin(theta_rad) + dS_dtheta .* cos(theta_rad);
 
 % Plot cam profile
 figure;
