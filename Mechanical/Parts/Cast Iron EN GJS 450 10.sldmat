@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mstns:materials version="2008.03" xmlns:mstns="http://www.solidworks.com/sldmaterials" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sldcolorswatch="http://www.solidworks.com/sldcolorswatch">
+  <curves id="curve0">
+    <point x="1.0" y="1.0" />
+    <point x="2.0" y="1.0" />
+    <point x="3.0" y="1.0" />
+  </curves>
+  <classification name="Material">
+    <material name="Cast iron, nodular graphite, EN GJS 450 10" description="" propertysource="Granta EduPack 2025 R2 - MaterialUniverse">
+      <physicalproperties>
+        <EX displayname="Tensile modulus" value="1.68953e+11" />
+        <NUXY displayname="Poisson's ratio" value="0.274955" />
+        <GXY displayname="Shear modulus" value="66453000000" />
+        <ALPX displayname="Thermal expansion coefficient" value="1.11803e-5" />
+        <DENS displayname="Density" value="7099.82" />
+        <KX displayname="Thermal conductivity" value="37.3363" />
+        <C displayname="Specific heat capacity" value="477.179" />
+        <SIGXT displayname="Tensile strength, ultimate" value="474342000" />
+        <SIGXC displayname="Compressive strength" value="334618000" />
+        <SIGYLD displayname="Tensile strength, yield" value="321551000" />
+      </physicalproperties>
+    </material>
+  </classification>
+</mstns:materials>
