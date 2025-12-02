@@ -214,7 +214,6 @@ Lui(i+1) = Lui(i) + P(i)*100000 * dv(i) * dteta;
 end
 
 
-
 Lui = Lui/1000;                                     %Indicated useful work
 
 % Calcolo i dati tecnici del motore
@@ -292,5 +291,22 @@ title('Pumping Cycle')
   plot (tetaciclo,Ox(:,3));
     xlabel('Theta')
   ylabel('Cylinder Unburned Mass')
+
+  % Added by Sean for flywheel calcs (need some torque stuff)
+
+  % Instant power at crank angle and instantaneous torque at crank angle
+  for z=1:siz
+    powKW(z) = nc * Lue(z) * rpm / 60 / 2;
+    tqNM(z) = powKW(z) * 1000 * 60 / 2 / pi / rpm;
+end
+
+% Mean torque
+meanTQ = mean(tqNM)
+
+% Subtract mean torque from torque
+modTQ = tqNM - meanTQ;
+
+% Delta E for flywheel is integral of T - T mean
+DeltaE = trapz(modTQ)
 
     
