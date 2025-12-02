@@ -10,12 +10,12 @@ clc;
 % Geometry (Need to adjust these as CAD is finalized)
 
 r = 0.0432; % [m] crank radius  (5 cm)
-l = 0.1524; % [m] conrod length (15.24 cm)
+l = 0.18; % [m] conrod length (15.24 cm)
 
 % RPM settings
 
-rpm_vec = 1000:250:8000; % range for max-speed curve (may need adjustments
-rpm_plot = 7031; % single RPM for speed-vs-angle plot
+rpm_vec = 1000:250:6000; % range for max-speed curve (may need adjustments)
+rpm_plot = 5000; % single RPM for speed-vs-angle plot
 
 % Angle from 0 to 360 degrees
 
