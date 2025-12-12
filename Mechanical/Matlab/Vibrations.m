@@ -4,25 +4,25 @@ clear
 bore = 108; % mm
 stroke = 86.4; % mm
 l = 180; % mm conrod length
-m_cs = 5.62343; % kg mass of crankshaft web (w/ counterweights) for one piston
-m_cr = 1.2024; % kg mass of connecting rod
-m_p = 0.952; % kg mass of piston head (including wrist pin)
+m_cs = 5.87615; % kg mass of crankshaft web (w/ counterweights) for one piston
+m_cr = 1.494; % kg mass of connecting rod
+m_p = 1.28134; % kg mass of piston head (including wrist pin)
 rpm_min = 800;
 rpm_max = 6000;
 int_rpm = 50;
 
 r = stroke/2; % mm crank radius
-r_cs = -9.09; % mm radial distance from rotational axis to crankshaft center of mass
-r_cr = 116.69; % mm distance from wrist pin to connecting rod center of mass
+r_cs = -7.86; % mm radial distance from rotational axis to crankshaft center of mass
+r_cr = 128.03; % mm distance from wrist pin to connecting rod center of mass
 
 m_cp = m_cs*(r_cs/r) + m_cr*(r_cr/l); % approximate mass acting on crankpin
 m_wp = m_p + m_cr*((l-r_cr)/l); % approximate mass acting on wrist pin
 
-I = [0.0002 0.0008 0.0203 0.0203 1.83]; % kg m^2 moments of inertia for timing connection, crankpin 1, crankpin 2, and flywheel
+I = [0.05 0.0008 0.0210 0.0210 0.0008 0.084]; % kg m^2 moments of inertia for timing connection, crankpin 1, crankpin 2, and flywheel
 % timing inertia is derived from Eq. 3 in the paper, summing all four camshaft moments of inertia at half the crankshaft speed
-kt = [1100000 1218040 1218040 1508040]; % Nm/rad from solidworks evaluation
-ca = [0 0 1 1 0]; % Nm/rad where pos 1 and 4 should remain 0, 2 and 3 depend on crankpin evaluation
-cr = [0 0 0 0]; % Nm/rad relative damping coefficients depend on evaluation of crankshaft
+kt = [110000 1218040 1218040 1218040 1508040]; % Nm/rad from solidworks evaluation
+ca = [0 0 1 1 0 0]; % Nm/rad where pos 1 and 4 should remain 0, 2 and 3 depend on crankpin evaluation
+cr = [0 0 0 0 0]; % Nm/rad relative damping coefficients depend on evaluation of crankshaft
 
 % setup pressure and rpm matrices
 opts = detectImportOptions('CylPressurePerRPM.csv'); % pressure in kPa from ?? angle
@@ -40,28 +40,30 @@ I(3:4) = I(3:4)+Ialt; % adding equivallent inertia to crankpin indecies
 M = diag(I);
 
 % Stiffness Matrix
-Kt = [kt(1)   -kt(1)         0           0         0 
-     -kt(1) kt(1)+kt(2)   -kt(2)         0         0
-        0     -kt(2)    kt(2)+kt(3)   -kt(3)       0
-        0        0        -kt(3)    kt(3)+kt(4) -kt(4)
-        0        0           0        -kt(4)     kt(4)];
+Kt = [kt(1)   -kt(1)         0           0            0         0
+     -kt(1) kt(1)+kt(2)   -kt(2)         0            0         0
+        0     -kt(2)    kt(2)+kt(3)   -kt(3)          0         0
+        0        0        -kt(3)    kt(3)+kt(4)    -kt(4)       0
+        0        0           0        -kt(4)     kt(4)+kt(5) -kt(5)
+        0        0           0           0         -kt(5)     kt(5)];
 
 % Damping Matrices
 Ca = diag(ca);
-Cr = [cr(1)   -cr(1)         0           0         0
-     -cr(1) cr(1)+cr(2)   -cr(2)         0         0
-        0     -cr(2)    cr(2)+cr(3)   -cr(3)       0
-        0        0         -cr(3)   cr(3)+cr(4) -cr(4)
-        0        0           0        -cr(4)     cr(4)];
+Cr = [cr(1)   -cr(1)         0           0          0         0
+     -cr(1) cr(1)+cr(2)   -cr(2)         0          0         0
+        0     -cr(2)    cr(2)+cr(3)   -cr(3)        0         0
+        0        0        -cr(3)   cr(3)+cr(4)   -cr(4)       0
+        0        0           0        -cr(4)   cr(4)+cr(5) -cr(5)
+        0        0           0           0       -cr(5)     cr(5)];
 C = Cr + Ca;
 
 % First State Matrix
-A = [zeros(5,5) eye(5) ; -M\Kt -M\C];
+A = [zeros(6,6) eye(6) ; -M\Kt -M\C];
 
 
 rpm = rpm_min:int_rpm:rpm_max;
-theta = zeros(length(rpm),5);
-amp = zeros(length(rpm),24,5);
+theta = zeros(length(rpm),6);
+amp = zeros(length(rpm),24,6);
 T = zeros(length(rpm),2);
 PressureInterpolation;
 
@@ -128,25 +130,25 @@ for rpm_num = 1:length(rpm)
     %}
 
     % New fourier coefficients from fourier approximations of cylinder torques
-    Cn(:,[1,2,5])=0;
+    Cn(:,[1,2,5,6])=0;
     Cn(:,2)=1/length(Mt)*fft(Mt(:,1));
     Cn(:,3)=1/length(Mt)*fft(Mt(:,2));
 
     for n = 1:24
-        bn = [zeros(5,1) ; M\transpose(Cn(n+1,1:5))]; % Excitation Vector
-        Fn = i*n*w*eye(10) - A; % Frequency Matrix
+        bn = [zeros(6,1) ; M\transpose(Cn(n+1,1:6))]; % Excitation Vector
+        Fn = i*n*w*eye(12) - A; % Frequency Matrix
         gn = Fn\bn; % Frequency Response Vector
         bigTheta = 2*abs(gn);
         phi = angle(gn);
-        for j=1:5
+        for j=1:6
             % Store fourier factors for Eq. 22 summation in paper
             amp(rpm_num,n,j) = max(bigTheta(j)*cos((n/2)*alpha - phi(j)))*180/pi;
         end
     end
-    theta(rpm_num,1:5) = sum(amp(rpm_num,:,:)); % Eq. 22, with j=1(1)4, max amplitudes for each element of crankshaft
+    theta(rpm_num,1:6) = sum(amp(rpm_num,:,:)); % Eq. 22, with j=1(1)4, max amplitudes for each element of crankshaft
 
     % Actuating dynamic torques
-    T(rpm_num,1:2) = abs(theta(rpm_num,[2 5])-theta(rpm_num,[3 4])).*kt([2 4])*pi/180;
+    T(rpm_num,1:2) = abs(theta(rpm_num,[2 6])-theta(rpm_num,[3 5])).*kt([2 4])*pi/180;
 end
 
 %

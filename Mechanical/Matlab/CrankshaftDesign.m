@@ -3,18 +3,18 @@ function [R_min, M_min, K_max] = CrankshaftDesign()
     w = 5000/60.0; % crank speed in rps
     
     % Defined Variables
-    a = 8.826; % cm axial distance between crankpins midpoint to midpoint
-    L = 13.239; % cm axial distance between outer pieces of crankweb
+    a = 10; % cm axial distance between crankpins midpoint to midpoint
+    L = 15; % cm axial distance between outer pieces of crankweb
     rr = 2.083; % rod ratio
     r_cw = 4.5; % cm radius of crankshaft web around journal bearings
     t = 1.2; % cm thickness of crankshaft web (which will be the same for counterweights)
 
-    m_cs = 3.332; % kg mass of crankshaft web per piston, no counterweight
-    m_cr = 1.247; % kg mass of connecting rod
-    m_p = 0.952; % kg mass of piston head (including wrist pin)
+    m_cs = 3.611; % kg mass of crankshaft web per piston, no counterweight
+    m_cr = 1.494; % kg mass of connecting rod
+    m_p = 1.28134; % kg mass of piston head (including wrist pin)
     
     r_cs = 2.16; % distance from rotational axis to crankshaft web center of mass
-    r_cr = 11.831; % distance from wrist pin to connecting rod center of mass
+    r_cr = 12.803; % distance from wrist pin to connecting rod center of mass
 
     rho = 7.85; % g/cm^3 for counterweight (4340 from SW)
 
@@ -53,12 +53,12 @@ function [R_min, M_min, K_max] = CrankshaftDesign()
                         end
 
                         K = CrankshaftBalancing(w,r,a,L,m_cp,m_wp,m_cw,g_cw,Ycw(i,:));
-                        if ~(K >= 75 && K <= 100) % if not within desired balance range
+                        if ~(K >= 60 && K <= 100) % if not within desired balance range
                             continue;
                         end
     
                         R_cw = max(R_top,R_side); % farthest protrusion of counterweight from rotational axis
-                        if(sum(Ycw(i,:)*m_cw) < minM) % lightest total counterweight mass at least 75% balanced
+                        if(sum(Ycw(i,:)*m_cw) < minM) % lightest total counterweight mass at least 60% balanced
                             M_min = ["Min Mass",R_cw,m_cw,K ; R_i,h_i,a_i,d_i ; Ycw(i,:)];
                             minM = sum(Ycw(i,:)*m_cw);
                         end
@@ -68,7 +68,7 @@ function [R_min, M_min, K_max] = CrankshaftDesign()
                             maxKR = R_cw;
                         end
                         
-                        if(R_cw < minR) % smallest outer radius at least 75% balanced
+                        if(R_cw < minR) % smallest outer radius at least 60% balanced
                             R_min = ["Min Size",R_cw,m_cw,K ; R_i,h_i,a_i,d_i ; Ycw(i,:)];
                             minR = R_cw;
                         end
