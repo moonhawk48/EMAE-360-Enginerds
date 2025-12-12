@@ -1,4 +1,5 @@
 function [out] = ClosedSystemCombustion()
+%Calculates the closed system portion of the otto cycle
 clc
 workspace;
 
@@ -16,7 +17,7 @@ TW = 500; % Wall temperature - TW
 fuel_type = 2; % gasoline
 FS = 0.06548; % stoichiometric fuel-air ratio for gasoline
 A0 = 47870; %
-
+%inlet temperature and pressure
 T1 = 350;
 P1 = 101.172; % kPa
 
@@ -43,14 +44,16 @@ EVO = 180;
     % IVC = varargin{9}-360;
     % EVO = varargin{10}-360;
 
-OMEGA = RPM*pi/30;
+%engine geometries    
+OMEGA = RPM*pi/30; %RPM to rad
 THETA = IVC; %IVC
 THETA_END = EVO; % EVO
-DTHETA = 1;
+DTHETA = 1; %step size
 THETAE = THETA+DTHETA;
 finalStep = floor((THETA_END+abs(THETA))/10);
-Up = S*OMEGA/pi;
+Up = S*OMEGA/pi; %mean piston speed
 
+%engine geometry function call
 [ VOL, X, EM ] = auxiliary( THETA );
 NNOX = THETAB/DTHETA;
 NY = 6+NNOX;
@@ -58,11 +61,12 @@ Y = zeros(NY,1);
 Y(1) = P1;
 Y(2) = nan;
 Y(3) = T1;
-
+%initial cylinder energy
 [~, ~, ~, ~, vU, ~, ~, ~, ~, ~] = farg( Y(3), Y(1), PHI, F, fuel_type );
 MNOT = VOL/vU;
 M = EM*MNOT;
 
+%zero arrays for outputs
 NN = 36*10;
 SAVE.THETA = zeros( NN, 1 );
 SAVE.VOL = zeros( NN, 1 );
@@ -71,19 +75,24 @@ SAVE.P = zeros( NN, 1 );
 SAVE.MDOTFI = zeros( NN, 1 );
 SAVE.NOX = zeros(NN,5);
 SAVE.NOe = zeros(NN,1);
+%display outputs
 fprintf( 'THETA    VOLUME   BURN FRAC  PRESSURE    BURN TEMP   UNBURNED T     WORK    HEAT LOSS    MASS      H-LEAK      NOx\n' );
 fprintf( ' deg      cm^3       --       kPa           K              K         J           J          g          J       ppm\n' );
 
 fprintf('%7.1f   %6.1f   %3.3f      %6.1f       %6.1f         %6.1f     %5.0f     %5.0f       %5.3f    %5.2f     %6.1f\n', ...
     THETA, VOL*1000000, X, Y(1), Y(2), Y(3), Y(4)*1000, Y(5)*1000, M*1000, Y(6)*1000, 0.0 );
 II = 1;
+%loop through combustion and expansion angles
 for III=1:finalStep      
     for JJJ=1:10
         NOe_save = 0;
+        %perform integration of differentials
         [ Y ] = integrate( THETA, THETAE, Y );
         [ VOL, X, EM ] = auxiliary( THETA );
+        %calculate ht coefficient
         HEAT = Woschni();
 
+        %mass inducted
         M = EM*MNOT;
         THETA=THETAE;
         THETAE=THETA+DTHETA;
@@ -127,7 +136,7 @@ for nn=1:NNOX;
     dxb = dxbdtheta*DTHETA;
     NOX_ppm = NOX_ppm + Y(6+nn)*dxb*to_ppm;
 end
-
+%calculate thermal efficiency and IMEP
 ETA = Y(4)/MNOT*(1+PHI*FS*(1-F))/PHI/FS/(1-F)/A0;
 IMEP = Y(4)/(pi/4*B^2*S);
 fprintf('ETA = %1.4f  IMEP = %7.3f kPa  NOx = %6.1f ppm\n', ETA, IMEP, NOX_ppm );
@@ -136,9 +145,8 @@ fprintf('ETA = %1.4f  IMEP = %7.3f kPa  NOx = %6.1f ppm\n', ETA, IMEP, NOX_ppm )
 W_total = Y(4);
 Q_total = Y(5);
 out = [W_total,Q_total];
+%if calling outside of excel, create plots
 if ( nargin == 2 )
-    % if not called externally with custom PHI, F, and RPM parameters,
-    % generate some plots
 
     sTitle = sprintf('Homogenous 2 zone, methane, PHI=%.2f F=%.2f RPM=%.1f\nETA=%.3f  IMEP=%.2f kPa  NOx=%.1f ppm ', PHI, F, RPM, ETA, IMEP, NOX_ppm );
 
@@ -179,6 +187,7 @@ if ( nargin == 2 )
 
 end
 
+%helper function for burn temperature
 function [ TB ] = tinitial( P, TU, PHI, F )
     TB = 2000;
     [~, HU,~, ~, ~, ~, ~, ~, ~, ~] = farg( TU, P, PHI, F, fuel_type );
@@ -195,6 +204,7 @@ function [ TB ] = tinitial( P, TU, PHI, F )
     end
 end
 
+%helper function for engine kinematics
 function [ VOL, X, EM ] = auxiliary( THETA )
     VTDC = pi/4*B^2*S/(R-1); % m3
     VOL = VTDC*(1 + (R-1)/2*(1-cosd(THETA) + 1/EPS*(1-sqrt(1-(EPS*sind(THETA))^2))));
@@ -208,6 +218,7 @@ function [ VOL, X, EM ] = auxiliary( THETA )
     EM = exp(-BLOWBY*(THETA*pi/180 + pi)/OMEGA);
 end
 
+%integration of differential functions
 function [Y] = integrate( THETA, THETAE, Y )
 
 [TT, YY ] = ode23( @rates, [ THETA, THETAE ], Y );
@@ -300,61 +311,12 @@ end
         end
         
         YPRIME(6) = BLOWBY*M/OMEGA*HL;
-        
-        % perform NOx integration for each element burned 
-        if ( X > 0.001 )
-            % COMBUSTION OR EXPANSION
-            for k=1:NNOX,                
-                if ( THETA >= THETAS + (k-1)/(NNOX-1)*THETAB )
-                    % convert Y(6+k) to [NO] mol/cm^3 from mass fraction
-                    % and then back
-                    YPRIME(6+k) = zeldovich( TB, P/100, YB, Y(6+k)/(MW_NO*VB*1000) )*MW_NO*VB*1000/OMEGA;
-                end
-            end            
-        end
-        
 
         % 1/omega is s/rad, so convert to s/deg
         for JJ=1:NY,
             YPRIME(JJ) = YPRIME(JJ)*pi/180;
         end
     end
-end
-
-function [ dNOdt ] = zeldovich( T, P, y, NO )
-    % calculate rate of NO formation d[NO]/dt given
-    % inputs:
-    %   T  [K]         : gas mixture temperature, kelvin
-    %   P  [bar]       : cylinder pressure, bar
-    %   y  [...]       : equilibrium mole fraction of constituents
-    %   NO [mol/cm^3]  : current NOx concentration    
-    % outputs:
-    %   dNOdt [ (mol/cm^3) / sec ]  : rate of NO formation
-            
-    % extended zeldovich rate constants from Heywood Table 11.1 (cm^3/mol-s)
-    k1 = 7.6*10^13*exp(-38000/T);
-    k2r = 1.5*10^9*T*exp(-19500/T);
-    k3r = 2*10^14*exp(-23650/T);
-    
-    N_V = (100000*P)/(8.314*T)*(1/100)^3; % calculate molar concentration [mol/cm^3]
-    
-    N2e = y(3)*N_V;
-    He = y(7)*N_V;
-    Oe = y(8)*N_V;
-    NOe = y(10)*N_V;
-    
-    R1 = k1*Oe*N2e;
-    R2 = k2r*NOe*Oe;
-    R3 = k3r*NOe*He;
-    
-    % ratios to check against Heywood Table 11.2
-    % at @ 2600 K, 10 bar, phi={0.8, 1, 1.2}
-%     R1
-%     R1R2 = R1/R2
-%     R1R2R3 = R1/(R2+R3)
-
-    alpha = NO/NOe;
-    dNOdt = 2*R1*(1-alpha*alpha)/(1+alpha*R1/(R2+R3)); 
 end
 
 function [h] = Woschni()
